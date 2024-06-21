@@ -1,0 +1,21 @@
+# Ignore the Dockerfile itself
+Dockerfile
+
+# Ignore the .dockerignore file
+.dockerignore
+
+# Ignore the node_modules directory
+node_modules
+
+# Ignore local Go build files
+*.out
+*.exe
+*.a
+*.so
+*.h
+*.o
+*.dll
+
+# Ignore directories that might contain sensitive data
+.env
+keys.json

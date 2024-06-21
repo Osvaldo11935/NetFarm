@@ -1,0 +1,63 @@
+package main
+
+import (
+    "database/sql"
+    "encoding/json"
+    "fmt"
+    "log"
+    "net/http"
+
+    "github.com/gorilla/mux"
+    _ "github.com/lib/pq"
+)
+
+const (
+    host     = "localhost"
+    port     = 5432
+    user     = "your_username"
+    password = "your_password"
+    dbname   = "your_database_name"
+)
+
+type Location struct {
+    Start string `json:"start"`
+    End   string `json:"end"`
+}
+
+func main() {
+    router := mux.NewRouter()
+    router.HandleFunc("/route", saveRoute).Methods("POST")
+
+    log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+func saveRoute(w http.ResponseWriter, r *http.Request) {
+    var loc Location
+    err := json.NewDecoder(r.Body).Decode(&loc)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    // Conectar ao banco de dados
+    dbinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+        host, port, user, password, dbname)
+    db, err := sql.Open("postgres", dbinfo)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer db.Close()
+
+    // Inserir os dados no banco de dados
+    _, err = db.Exec("INSERT INTO routes (start, end) VALUES ($1, $2)", loc.Start, loc.End)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // Criar a URL para a rota no Google Maps
+    googleMapsURL := fmt.Sprintf("https://www.google.com/maps/dir/%s/%s", loc.Start, loc.End)
+
+    // Retornar a URL da rota no Google Maps
+    response := map[string]string{"route": googleMapsURL}
+    json.NewEncoder(w).Encode(response)
+}
