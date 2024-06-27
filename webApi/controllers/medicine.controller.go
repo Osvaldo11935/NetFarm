@@ -46,6 +46,27 @@ func (controller *MedicineController) HandleCreate(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, webResponse)
 }
 
+func (controller *MedicineController) HandleCreateMedicineCategory(ctx *gin.Context) {
+	medicineId := ctx.Param("medicineId")
+
+	var medicineCategoryIdsRequest []string
+
+	err := ctx.ShouldBindJSON(&medicineCategoryIdsRequest)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	createErr := controller.MedicineService.CreateMedicineCategory(medicineId, medicineCategoryIdsRequest)
+
+	if createErr != nil {
+		ctx.JSON(http.StatusBadRequest, createErr)
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, nil)
+}
+
 func (controller *MedicineController) HandleFindAllMedicine(ctx *gin.Context) {
 
 	page, _ := strconv.Atoi(ctx.Query("pageNumber"))

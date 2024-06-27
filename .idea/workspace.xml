@@ -4,7 +4,47 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="37dfbadb-d5f7-44a6-9247-e229fccaf61c" name="Changes" comment="" />
+    <list default="true" id="eadc3827-be5f-42cb-9e60-1ef60cac404b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/shared/models/responses/role.response.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shared/models/responses/userInfo.response.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/controllers/category.controller.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/middleware/auth.middleware.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/models/requests/createMedicineCategory.request.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/models/requests/updateCategory.request.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/models/responses/signIn.response.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/address.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/category.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/common/router.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/expense.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/fileType.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/imposed.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/medicine.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/order.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/orderDetail.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/orderItem.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/orderStatus.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/ordersFile.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/payment.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/person.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/provider.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/role.route.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/routers/user.route.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/NetFarm.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/NetFarm.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/interfaces/iservices/icategory.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/interfaces/iservices/icategory.service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/interfaces/iservices/imedicine.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/interfaces/iservices/imedicine.service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/interfaces/iservices/iuser.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/interfaces/iservices/iuser.service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/services/category.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/services/category.service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/services/medicine.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/services/medicine.service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/services/user.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/services/user.service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/domain/entities/medicine.go" beforeDir="false" afterPath="$PROJECT_DIR$/domain/entities/medicine.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApi/controllers/medicine.controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/webApi/controllers/medicine.controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApi/controllers/user.controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/webApi/controllers/user.controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApi/routers/router.go" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,10 +53,6 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="tsconfig.json" />
-        <option value="Go Application" />
-        <option value="Dockerfile" />
-        <option value="Swagger" />
         <option value="Go File" />
       </list>
     </option>
@@ -25,13 +61,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
-  </component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 4
+  &quot;associatedIndex&quot;: 5
 }</component>
-  <component name="ProjectId" id="2gXb0Ew8j10X0LyXjX55O6bmnm1" />
+  <component name="ProjectId" id="2iCcy51Q9cZzTGm37P9O4IUmmHG" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -39,7 +72,7 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
-    &quot;Go Build.go build NetFarm1.executor&quot;: &quot;Debug&quot;,
+    &quot;Go Build.go build NetFarm.executor&quot;: &quot;Debug&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
@@ -48,50 +81,25 @@
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
     &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/Projecto/Go/Outros/NetFarm&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;swagger&quot;
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
   }
 }</component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Projecto\Go\Outros\NetFarm1\shared\errors\notfounds" />
-      <recent name="D:\Projecto\Go\Outros\NetFarm1\shared\models\common" />
-    </key>
-  </component>
   <component name="RunManager">
-    <configuration name="go build NetFarm1" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="NetFarm1" />
+    <configuration name="go build NetFarm" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="NetFarm" />
       <working_directory value="$PROJECT_DIR$" />
-      <envs>
-        <env name="POSTGRES_DATABASE" value="netfarm" />
-        <env name="POSTGRES_HOST" value="localhost" />
-        <env name="POSTGRES_PASSWORD" value="123" />
-        <env name="POSTGRES_PORT" value="5432" />
-        <env name="POSTGRES_USER" value="root" />
-      </envs>
-      <EXTENSION ID="net.ashald.envfile">
-        <option name="IS_ENABLED" value="false" />
-        <option name="IS_SUBST" value="false" />
-        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
-        <option name="IS_IGNORE_MISSING_FILES" value="false" />
-        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
-        <ENTRIES>
-          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
-        </ENTRIES>
-      </EXTENSION>
       <kind value="PACKAGE" />
-      <package value="NetFarm1" />
+      <package value="NetFarm" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/main.go" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build NetFarm1" />
+        <item itemvalue="Go Build.go build NetFarm" />
       </list>
     </recent_temporary>
   </component>

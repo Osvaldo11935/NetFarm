@@ -15,7 +15,7 @@ type CategoryService struct {
 
 func NewCategoryService(CategoryRepo irepositories.ICategoryRepository) iservices.ICategoryService {
 	return &CategoryService{
-		CategoryRepo:CategoryRepo,
+		CategoryRepo: CategoryRepo,
 	}
 }
 
@@ -43,16 +43,16 @@ func (s *CategoryService) FindAllCategory(pagination *common.Pagination) ([]enti
 		return Category, errors.NewCategoryUnknownError(findErr.Error(), "falha ao buscar estado")
 	}
 
-	pagination.Data =Category
+	pagination.Data = Category
 
 	return Category, nil
 }
 
-func (s *CategoryService) FindBycategoryId(CategoryId string) (entities.Category, *common.ErrorResponse) {
+func (s *CategoryService) FindByCategoryId(CategoryId string) (entities.Category, *common.ErrorResponse) {
 
 	var Category entities.Category
 
-	findErr := s.CategoryRepo.Query().First(&Category, "Id",CategoryId).Error
+	findErr := s.CategoryRepo.Query().First(&Category, "Id", CategoryId).Error
 
 	if findErr != nil {
 		return Category, errors.NewCategoryUnknownError(findErr.Error(), "falha ao buscar estado")
@@ -63,7 +63,7 @@ func (s *CategoryService) FindBycategoryId(CategoryId string) (entities.Category
 
 func (s *CategoryService) UpdateCategory(categoryId string, name *string, description *string) *common.ErrorResponse {
 
-	Category, err := s.FindBycategoryId(categoryId)
+	Category, err := s.FindByCategoryId(categoryId)
 
 	if err != nil {
 		return err
@@ -82,7 +82,7 @@ func (s *CategoryService) UpdateCategory(categoryId string, name *string, descri
 
 func (s *CategoryService) DeleteCategory(CategoryId string) *common.ErrorResponse {
 
-	Category, err := s.FindBycategoryId(CategoryId)
+	Category, err := s.FindByCategoryId(CategoryId)
 
 	if err != nil {
 		return err

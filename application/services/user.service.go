@@ -8,6 +8,7 @@ import (
 	"NetFarm/domain/entities"
 	"NetFarm/shared/errors"
 	"NetFarm/shared/models/common"
+	"NetFarm/shared/models/responses"
 )
 
 type UserService struct {
@@ -44,26 +45,26 @@ func (s *UserService) CreateUser(User *entities.User, roleName string) *common.E
 	return nil
 }
 
-func (s *UserService) SignIn(email string, password string) string {
+func (s *UserService) SignIn(email string, password string) (*string, *common.ErrorResponse) {
 
 	var claims []string
 
 	var user entities.User
 
 	query := s.UserRepo.Query().
-		Where("Email", email)
-	//Where("Password", password)
+		Where("Email", email).
+		Where("Password", password)
 
 	findErr := query.First(&user).Error
 
 	if findErr != nil {
-		//"", errors.NewUserUnknownError(findErr.Error(), "falha ao buscar usuario")
+		return nil, errors.NewUserUnknownError(findErr.Error(), "falha ao buscar token de acesso")
 	}
 
 	role, findRoleErr := s.RoleService.FindRoleById(user.RoleId)
 
 	if findRoleErr != nil {
-
+		return nil, findRoleErr
 	}
 
 	claims = append(claims, role.Name)
@@ -71,10 +72,10 @@ func (s *UserService) SignIn(email string, password string) string {
 	token, tokenErr := s.TokenService.GenerateToken(user.Email, user.Id, claims)
 
 	if tokenErr != nil {
-
+		return nil, errors.NewUserUnknownError(tokenErr.Error(), "falha ao buscar token de acesso")
 	}
 
-	return token
+	return &token, nil
 
 }
 
@@ -107,6 +108,28 @@ func (s *UserService) FindUserById(UserId string) (entities.User, *common.ErrorR
 	}
 
 	return User, nil
+}
+
+func (s *UserService) FindUserInfo(userId string) (*responses.UserInfoResponse, *common.ErrorResponse) {
+
+	var user entities.User
+	var role entities.Role
+
+	findUserErr := s.UserRepo.Query().First(&user, "Id", userId).Error
+
+	if findUserErr != nil {
+		return nil, errors.NewUserUnknownError(findUserErr.Error(), "falha ao buscar usuario")
+	}
+
+	role, findRoleErr := s.RoleService.FindRoleById(user.RoleId)
+
+	if findRoleErr != nil {
+		return nil, errors.NewUserUnknownError("falha ao buscar usuario", findRoleErr.Description)
+	}
+
+	userInfo := responses.NewUserInfoResponse(user, role)
+
+	return &userInfo, nil
 }
 
 func (s *UserService) UpdateUser(UserId string, email *string, userName *string, phoneNumber *string) *common.ErrorResponse {

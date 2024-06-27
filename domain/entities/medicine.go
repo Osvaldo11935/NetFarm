@@ -6,14 +6,14 @@ import (
 )
 
 type Medicine struct {
-	Id               string             `gorm:"column:Id;primaryKey" json:"id"`
-	Name             string             `gorm:"column:Name" json:"name"`
-	Description      string             `gorm:"column:Description" json:"description"`
-	Quantity         int                `gorm:"column:Quantity" json:"quantity"`
-	Price            float64            `gorm:"column:Price" json:"price"`
-	ProviderId       string             `gorm:"column:ProviderId" json:"providerId"`
-	IsActive         bool               `gorm:"column:IsActive" json:"isActive"`
-	MedicineCategory []MedicineCategory `gorm:"foreignKey:MedicineId;references:Id" json:"medicineCategory"`
+	Id                 string             `gorm:"column:Id;primaryKey" json:"id"`
+	Name               string             `gorm:"column:Name" json:"name"`
+	Description        string             `gorm:"column:Description" json:"description"`
+	Quantity           int                `gorm:"column:Quantity" json:"quantity"`
+	Price              float64            `gorm:"column:Price" json:"price"`
+	ProviderId         string             `gorm:"column:ProviderId" json:"providerId"`
+	IsActive           bool               `gorm:"column:IsActive" json:"isActive"`
+	MedicineCategories []MedicineCategory `gorm:"foreignKey:MedicineId;references:Id" json:"medicineCategories"`
 }
 
 func (medicine *Medicine) TableName() string {
@@ -24,6 +24,13 @@ func (medicine *Medicine) BeforeCreate(*gorm.DB) (err error) {
 	medicine.Id = uuid.New().String()
 	medicine.IsActive = true
 	return
+}
+func (medicine *Medicine) SetCategory(categoryIds []string) {
+	newCategories := make([]MedicineCategory, len(categoryIds))
+	for i, id := range categoryIds {
+		newCategories[i] = MedicineCategory{CategoryId: id}
+	}
+	medicine.MedicineCategories = append(medicine.MedicineCategories, newCategories...)
 }
 
 func (medicine *Medicine) Update(name *string, description *string, quantity *int, price *float64) {

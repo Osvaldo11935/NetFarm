@@ -30,6 +30,25 @@ func (s *MedicineService) Create(medicine *entities.Medicine) *common.ErrorRespo
 	return nil
 }
 
+func (s *MedicineService) CreateMedicineCategory(medicineId string, categoryIds []string) *common.ErrorResponse {
+
+	medicine, findErr := s.FindMedicineById(medicineId)
+
+	if findErr != nil {
+		return findErr
+	}
+
+	medicine.SetCategory(categoryIds)
+
+	updatedErr := s.MedicineRepo.Update(medicine)
+
+	if updatedErr != nil {
+		return errors.NewMedicineUnknownError(updatedErr.Error(), "falha ao adicionar categoria no remedio")
+	}
+
+	return nil
+}
+
 func (s *MedicineService) FindAllMedicine(pagination *common.Pagination) ([]entities.Medicine, *common.ErrorResponse) {
 
 	query := s.MedicineRepo.Query()
@@ -43,7 +62,7 @@ func (s *MedicineService) FindAllMedicine(pagination *common.Pagination) ([]enti
 	if findErr != nil {
 		return medicines, errors.NewMedicineUnknownError(findErr.Error(), "falha ao buscar remedio")
 	}
-	
+
 	pagination.Data = medicines
 
 	return medicines, nil
@@ -98,9 +117,9 @@ func (s *MedicineService) UpdateMedicine(medicineId string, name *string, descri
 	return nil
 }
 
-func (s *MedicineService) DeleteMedicine(fileTypeId string) *common.ErrorResponse {
+func (s *MedicineService) DeleteMedicine(medicineId string) *common.ErrorResponse {
 
-	medicine, err := s.FindMedicineById(fileTypeId)
+	medicine, err := s.FindMedicineById(medicineId)
 
 	if err != nil {
 		return err

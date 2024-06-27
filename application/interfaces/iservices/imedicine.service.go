@@ -7,6 +7,7 @@ import (
 
 type IMedicineService interface {
 	Create(medicine *entities.Medicine) *common.ErrorResponse
+	CreateMedicineCategory(medicineId string, categoryIds []string) *common.ErrorResponse
 	FindAllMedicine(pagination *common.Pagination) ([]entities.Medicine, *common.ErrorResponse)
 	FindMedicineByProvider(providerId string, pagination *common.Pagination) ([]entities.Medicine, *common.ErrorResponse)
 	FindMedicineById(medicineId string) (entities.Medicine, *common.ErrorResponse)

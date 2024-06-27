@@ -6,6 +6,7 @@ import (
 	"NetFarm/shared/constants"
 	"NetFarm/shared/models/common"
 	"NetFarm/webApi/models/requests"
+	"NetFarm/webApi/models/responses"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -31,16 +32,16 @@ func (controller *UserController) HandleSignIn(ctx *gin.Context) {
 		fmt.Println(err)
 	}
 
-	createErr := controller.UserService.SignIn(signInRequest.Email, signInRequest.Password)
+	token, tokenErr := controller.UserService.SignIn(signInRequest.Email, signInRequest.Password)
 
-	//if createErr != nil {
-	//	ctx.JSON(http.StatusBadRequest, createErr)
-	//	return
-	//}
+	if tokenErr != nil {
+		ctx.JSON(http.StatusBadRequest, tokenErr)
+		return
+	}
 
-	//webResponse := common.BaseCreateResponse{Id: createUserRequest.Id}
+	webResponse := responses.SignInResponse{AccessToken: *token}
 
-	ctx.JSON(http.StatusOK, createErr)
+	ctx.JSON(http.StatusOK, webResponse)
 }
 
 func (controller *UserController) HandleCreateAdmin(ctx *gin.Context) {
@@ -127,6 +128,18 @@ func (controller *UserController) HandleFindUserById(ctx *gin.Context) {
 	userId := ctx.Param("userId")
 
 	User, findErr := controller.UserService.FindUserById(userId)
+
+	if findErr != nil {
+		ctx.JSON(http.StatusBadRequest, findErr)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, User)
+}
+func (controller *UserController) HandleFindUserInfo(ctx *gin.Context) {
+	userId, _ := ctx.Get("userId")
+
+	User, findErr := controller.UserService.FindUserInfo(userId.(string))
 
 	if findErr != nil {
 		ctx.JSON(http.StatusBadRequest, findErr)

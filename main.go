@@ -6,7 +6,7 @@ import (
 	"NetFarm/infrastructure/storages"
 	"NetFarm/persistence/repositories"
 	"NetFarm/webApi/controllers"
-	"NetFarm/webApi/routers"
+	"NetFarm/webApi/routers/common"
 	"fmt"
 	"net/http"
 )
@@ -28,6 +28,7 @@ func main() {
 	imposedRepo := repositories.NewImposedRepository()
 	expenseRepo := repositories.NewExpenseRepository()
 	orderDetailRepo := repositories.NewOrderDetailRepository()
+	categoryRepo := repositories.NewCategoryRepository()
 
 	// Service
 	orderService := services.NewOrderService(ordersRepo)
@@ -46,6 +47,7 @@ func main() {
 	orderDetailService := services.NewOrderDetailService(orderDetailRepo)
 	jwtTokenService := externalService.NewJwtTokenService()
 	userService := services.NewUserService(userRepo, jwtTokenService, roleService)
+	categoryService := services.NewCategoryService(categoryRepo)
 
 	// Storage
 	fileManagerStorage := storages.NewGoogleStorage()
@@ -66,9 +68,10 @@ func main() {
 	imposedController := controllers.NewImposedController(imposedService)
 	expenseController := controllers.NewExpenseController(expenseService)
 	orderDetailController := controllers.NewOrderDetailController(orderDetailService)
+	categoryController := controllers.NewCategoryController(categoryService)
 
 	// Router
-	routes := routers.NewRouter(
+	routes := common.NewRouter(
 		orderController,
 		orderFileController,
 		orderStatusController,
@@ -83,7 +86,8 @@ func main() {
 		paymentController,
 		expenseController,
 		imposedController,
-		orderDetailController)
+		orderDetailController,
+		categoryController)
 
 	server := &http.Server{
 		Addr:    ":8000",
