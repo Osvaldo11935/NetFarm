@@ -5,45 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eadc3827-be5f-42cb-9e60-1ef60cac404b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/shared/models/responses/role.response.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shared/models/responses/userInfo.response.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/controllers/category.controller.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/middleware/auth.middleware.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/models/requests/createMedicineCategory.request.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/models/requests/updateCategory.request.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/models/responses/signIn.response.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/address.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/category.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/common/router.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/expense.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/fileType.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/imposed.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/medicine.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/order.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/orderDetail.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/orderItem.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/orderStatus.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/ordersFile.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/payment.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/person.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/provider.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/role.route.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webApi/routers/user.route.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/NetFarm.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/NetFarm.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/setup/controllers.seup.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/setup/repositories.setup.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webApi/setup/services.setup.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/application/interfaces/iservices/icategory.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/interfaces/iservices/icategory.service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/application/interfaces/iservices/imedicine.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/interfaces/iservices/imedicine.service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/application/interfaces/iservices/iuser.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/interfaces/iservices/iuser.service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/application/services/category.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/services/category.service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/application/services/medicine.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/services/medicine.service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/interfaces/iinfrastructure/iexternalServices/ijwtToken.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/interfaces/iinfrastructure/iexternalServices/ijwtToken.service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/application/services/user.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/application/services/user.service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/entities/medicine.go" beforeDir="false" afterPath="$PROJECT_DIR$/domain/entities/medicine.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infrastructure/externalService/jwtToken.service.go" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/externalService/jwtToken.service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApi/controllers/medicine.controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/webApi/controllers/medicine.controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApi/controllers/user.controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/webApi/controllers/user.controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webApi/routers/router.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/webApi/models/responses/signIn.response.go" beforeDir="false" afterPath="$PROJECT_DIR$/webApi/models/responses/signIn.response.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,6 +57,11 @@
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Projecto\Go\Outros\NetFarm\webApi\routers\common" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="go build NetFarm" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="NetFarm" />
