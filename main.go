@@ -2,6 +2,7 @@ package main
 
 import (
 	"NetFarm/infrastructure/storages"
+	"NetFarm/shared/extensions"
 	"NetFarm/webApi/routers/common"
 	"NetFarm/webApi/setup"
 	"fmt"
@@ -34,9 +35,10 @@ func main() {
 		controllersSetup.OrderDetailController,
 		controllersSetup.CategoryController,
 	)
-
+	port := extensions.GetEnv("PORT")
+	
 	server := &http.Server{
-		Addr:    ":8000",
+		Addr:    ":"+port,
 		Handler: routes,
 	}
 

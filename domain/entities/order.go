@@ -1,9 +1,11 @@
 package entities
 
 import (
+	object_values "NetFarm/domain/objectValues"
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"time"
 )
 
 type Order struct {
@@ -23,6 +25,7 @@ func (order *Order) TableName() string {
 func (order *Order) BeforeCreate(*gorm.DB) (err error) {
 	order.Id = uuid.New().String()
 	order.CreatedAt = time.Now()
+	order.StatusId = object_values.STATUS_TYPE_IN_PROCESSING_ID
 	return
 }
 

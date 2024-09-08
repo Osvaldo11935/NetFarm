@@ -17,5 +17,4 @@ func AddUserRoute(route *gin.RouterGroup, controller *controllers.UserController
 	userRouter.GET("user-info", middleware.AuthMiddleware(), controller.HandleFindUserInfo)
 	userRouter.PUT(":userId", controller.HandleUpdateUser)
 	userRouter.DELETE(":userId", controller.HandleDeleteUser)
-
 }
