@@ -13,6 +13,7 @@ type OrderDetail struct {
 	ImposedId      string  `gorm:"column:ImposedId" json:"imposedId"`
 	ExpenseId      string  `gorm:"column:ExpenseId" json:"expenseId"`
 	OrderId        string  `gorm:"column:OrderId" json:"orderId"`
+	OrderAddress   string  `gorm:"column:OrderAddress" json:"orderAddress"`
 }
 
 func (orderDetail *OrderDetail) TableName() string {
