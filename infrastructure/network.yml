@@ -334,28 +334,6 @@ Resources:
 
             StatusCode: HTTP_301
 
-
-  ALBHttpsListener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-
-    Properties:
-      LoadBalancerArn: !Ref ApplicationLoadBalancer
-
-      Port: 443
-
-      Protocol: HTTPS
-
-      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
-
-      Certificates:
-        - CertificateArn: !Ref CertificateArn
-
-      DefaultActions:
-
-        - Type: forward
-
-          TargetGroupArn: !Ref TargetGroup
-
   # ==========================================================
   # netfarm PATH RULE
   # ==========================================================
@@ -365,7 +343,7 @@ Resources:
 
     Properties:
 
-      ListenerArn: !Ref ALBHttpsListener
+      ListenerArn: !Ref ALBHttpListener
 
       Priority: 10
 
