@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: ACD Plataform ECS Fargate Infrastructure
+Description: NetFarm ECS Fargate Infrastructure
 
 Parameters:
 
@@ -21,7 +21,7 @@ Parameters:
 
   ContainerPort:
     Type: Number
-    Default: 3000
+    Default: 8000
 
   ContainerCpu:
     Type: String
@@ -44,6 +44,7 @@ Resources:
 
   LogGroup:
     Type: AWS::Logs::LogGroup
+
     Properties:
       LogGroupName: !Sub '/ecs/${ProjectName}'
       RetentionInDays: 30
@@ -55,6 +56,7 @@ Resources:
 
   ECSCluster:
     Type: AWS::ECS::Cluster
+
     Properties:
       ClusterName: !Sub '${ProjectName}-cluster'
 
@@ -67,12 +69,15 @@ Resources:
     Type: AWS::IAM::Role
 
     Properties:
+
       RoleName: !Sub '${ProjectName}-ecs-execution-role'
 
       AssumeRolePolicyDocument:
+
         Version: '2012-10-17'
 
         Statement:
+
           - Effect: Allow
 
             Principal:
@@ -83,6 +88,7 @@ Resources:
               - sts:AssumeRole
 
       ManagedPolicyArns:
+
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
 
 
@@ -94,23 +100,58 @@ Resources:
     Type: AWS::IAM::Policy
 
     Properties:
+
       PolicyName: !Sub '${ProjectName}-ecs-secrets-policy'
 
       Roles:
         - !Ref ECSExecutionRole
 
       PolicyDocument:
+
         Version: '2012-10-17'
 
         Statement:
+
           - Effect: Allow
 
             Action:
+
               - secretsmanager:GetSecretValue
 
             Resource:
+
+              # POSTGRES
               - Fn::ImportValue:
-                  !Sub '${ProjectName}-DatabaseUrlSecretArn'
+                  !Sub '${ProjectName}-PostgresUserSecretArn'
+
+              - Fn::ImportValue:
+                  !Sub '${ProjectName}-PostgresPortSecretArn'
+
+              - Fn::ImportValue:
+                  !Sub '${ProjectName}-PostgresHostSecretArn'
+
+              - Fn::ImportValue:
+                  !Sub '${ProjectName}-PostgresPasswordSecretArn'
+
+              - Fn::ImportValue:
+                  !Sub '${ProjectName}-PostgresDatabaseSecretArn'
+
+              - Fn::ImportValue:
+                  !Sub '${ProjectName}-PostgresConnectionStringSecretArn'
+
+              # GOOGLE STORAGE
+              - Fn::ImportValue:
+                  !Sub '${ProjectName}-BucketNameSecretArn'
+
+              - Fn::ImportValue:
+                  !Sub '${ProjectName}-FileConfigGoogleStorageSecretArn'
+
+              - Fn::ImportValue:
+                  !Sub '${ProjectName}-BaseUrlGoogleStorageSecretArn'
+
+              # APPLICATION
+              - Fn::ImportValue:
+                  !Sub '${ProjectName}-PortSecretArn'
 
 
   # ==========================================================
@@ -121,12 +162,15 @@ Resources:
     Type: AWS::IAM::Role
 
     Properties:
+
       RoleName: !Sub '${ProjectName}-ecs-task-role'
 
       AssumeRolePolicyDocument:
+
         Version: '2012-10-17'
 
         Statement:
+
           - Effect: Allow
 
             Principal:
@@ -154,6 +198,7 @@ Resources:
       NetworkMode: awsvpc
 
       RequiresCompatibilities:
+
         - FARGATE
 
       Cpu: !Ref ContainerCpu
@@ -170,6 +215,10 @@ Resources:
           - ECSTaskRole
           - Arn
 
+
+      # ========================================================
+      # CONTAINER
+      # ========================================================
 
       ContainerDefinitions:
 
@@ -198,54 +247,91 @@ Resources:
 
 
           # ==================================================
-          # ENVIRONMENT VARIABLES
-          # ==================================================
-
-          Environment:
-
-            - Name: POSTGRES_USER
-              Value: netfarm
-
-            - Name: POSTGRES_PORT
-              Value: '5432'
-
-            - Name: POSTGRES_HOST
-              Value: 'SEU_HOST_POSTGRES'
-
-            - Name: POSTGRES_DATABASE
-              Value: netfarm
-
-            - Name: BUCKET_NAME
-              Value: document-land
-
-            - Name: FILE_CONFIG_GOOGLE_STORAGE
-              Value: keys.json
-
-            - Name: BASE_URL_GOOGLE_STORAGE
-              Value: https://storage.googleapis.com
-
-            - Name: PORTPORT
-              Value: '8000'
-
-
-          # ==================================================
           # SECRETS
           # ==================================================
 
           Secrets:
 
-            - Name: POSTGRES_CONNECTION_STRING
+            # ------------------------------------------------
+            # POSTGRES
+            # ------------------------------------------------
+
+            - Name: POSTGRES_USER
 
               ValueFrom:
                 Fn::ImportValue:
-                  !Sub '${ProjectName}-DatabaseUrlSecretArn'
+                  !Sub '${ProjectName}-PostgresUserSecretArn'
+
+
+            - Name: POSTGRES_PORT
+
+              ValueFrom:
+                Fn::ImportValue:
+                  !Sub '${ProjectName}-PostgresPortSecretArn'
+
+
+            - Name: POSTGRES_HOST
+
+              ValueFrom:
+                Fn::ImportValue:
+                  !Sub '${ProjectName}-PostgresHostSecretArn'
 
 
             - Name: POSTGRES_PASSWORD
 
               ValueFrom:
                 Fn::ImportValue:
-                  !Sub '${ProjectName}-DatabaseUrlSecretArn'
+                  !Sub '${ProjectName}-PostgresPasswordSecretArn'
+
+
+            - Name: POSTGRES_DATABASE
+
+              ValueFrom:
+                Fn::ImportValue:
+                  !Sub '${ProjectName}-PostgresDatabaseSecretArn'
+
+
+            - Name: POSTGRES_CONNECTION_STRING
+
+              ValueFrom:
+                Fn::ImportValue:
+                  !Sub '${ProjectName}-PostgresConnectionStringSecretArn'
+
+
+            # ------------------------------------------------
+            # GOOGLE STORAGE
+            # ------------------------------------------------
+
+            - Name: BUCKET_NAME
+
+              ValueFrom:
+                Fn::ImportValue:
+                  !Sub '${ProjectName}-BucketNameSecretArn'
+
+
+            - Name: FILE_CONFIG_GOOGLE_STORAGE
+
+              ValueFrom:
+                Fn::ImportValue:
+                  !Sub '${ProjectName}-FileConfigGoogleStorageSecretArn'
+
+
+            - Name: BASE_URL_GOOGLE_STORAGE
+
+              ValueFrom:
+                Fn::ImportValue:
+                  !Sub '${ProjectName}-BaseUrlGoogleStorageSecretArn'
+
+
+            # ------------------------------------------------
+            # APPLICATION
+            # ------------------------------------------------
+
+            - Name: PORT
+
+              ValueFrom:
+                Fn::ImportValue:
+                  !Sub '${ProjectName}-PortSecretArn'
 
 
           # ==================================================
@@ -272,6 +358,7 @@ Resources:
       Tags:
 
         - Key: Project
+
           Value: !Ref ProjectName
 
 
@@ -298,6 +385,10 @@ Resources:
       TaskDefinition: !Ref TaskDefinition
 
 
+      # ========================================================
+      # DEPLOYMENT
+      # ========================================================
+
       DeploymentConfiguration:
 
         MaximumPercent: 200
@@ -316,6 +407,7 @@ Resources:
           ContainerPort: !Ref ContainerPort
 
           TargetGroupArn:
+
             Fn::ImportValue:
               !Sub '${NetworkStackName}-TargetGroupArn'
 
@@ -344,7 +436,16 @@ Resources:
                 !Sub '${NetworkStackName}-PublicSubnet2'
 
 
+      # ========================================================
+      # HEALTH CHECK GRACE PERIOD
+      # ========================================================
+
       HealthCheckGracePeriodSeconds: 60
+
+
+      # ========================================================
+      # DEPLOYMENT CONTROLLER
+      # ========================================================
 
       DeploymentController:
 
@@ -357,12 +458,21 @@ Resources:
 
 Outputs:
 
+
+  # ==========================================================
+  # CLUSTER
+  # ==========================================================
+
   ClusterName:
 
     Description: ECS Cluster Name
 
     Value: !Ref ECSCluster
 
+
+  # ==========================================================
+  # SERVICE
+  # ==========================================================
 
   ServiceName:
 
@@ -371,12 +481,20 @@ Outputs:
     Value: !Ref ECSService
 
 
+  # ==========================================================
+  # TASK DEFINITION
+  # ==========================================================
+
   TaskDefinition:
 
     Description: ECS Task Definition
 
     Value: !Ref TaskDefinition
 
+
+  # ==========================================================
+  # EXECUTION ROLE
+  # ==========================================================
 
   ExecutionRole:
 
@@ -387,6 +505,10 @@ Outputs:
         - ECSExecutionRole
         - Arn
 
+
+  # ==========================================================
+  # TASK ROLE
+  # ==========================================================
 
   TaskRole:
 
