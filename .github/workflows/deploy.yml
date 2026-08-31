@@ -1,0 +1,320 @@
+name: Deploy FastAPI to ECS
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_NAME: netfarm
+  NETWORK_STACK_NAME: netfarm-network
+  SECRETS_STACK_NAME: netfarm-secrets
+  ECS_STACK_NAME: netfarm-ecs
+
+jobs:
+
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ==========================================================
+      # 1. CHECKOUT
+      # ==========================================================
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+
+      # ==========================================================
+      # 2. CONFIGURE AWS
+      # ==========================================================
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+
+      # ==========================================================
+      # 3. SETUP DOCKER BUILDX
+      # ==========================================================
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+
+      # ==========================================================
+      # 4. LOGIN TO ECR
+      # ==========================================================
+
+      - name: Log in to Amazon ECR
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          ECR_URL: ${{ secrets.ECR_URL }}
+
+        run: |
+
+          aws ecr get-login-password \
+            --region "$AWS_REGION" \
+            | docker login \
+              --username AWS \
+              --password-stdin "$ECR_URL"
+
+
+      # ==========================================================
+      # 5. DEFINE IMAGE TAG
+      # ==========================================================
+
+      - name: Define Docker image tag
+        id: image
+
+        env:
+          ECR_URL: ${{ secrets.ECR_URL }}
+
+        run: |
+
+          IMAGE_TAG="${GITHUB_SHA::7}"
+
+          IMAGE="$ECR_URL:$IMAGE_TAG"
+
+          echo "IMAGE_TAG=$IMAGE_TAG"
+          echo "IMAGE=$IMAGE"
+
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+
+      # ==========================================================
+      # 6. BUILD DOCKER IMAGE
+      # ==========================================================
+
+      - name: Build Docker image
+
+        env:
+          IMAGE: ${{ steps.image.outputs.image }}
+
+        run: |
+
+          docker build \
+            -t "$IMAGE" \
+            .
+
+
+      # ==========================================================
+      # 7. PUSH DOCKER IMAGE
+      # ==========================================================
+
+      - name: Push Docker image
+
+        env:
+          IMAGE: ${{ steps.image.outputs.image }}
+
+        run: |
+
+          docker push "$IMAGE"
+
+
+      # ==========================================================
+      # 8. DEPLOY NETWORK
+      # ==========================================================
+
+      - name: Deploy Network Infrastructure
+
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+        run: |
+
+          echo "Deploying network infrastructure..."
+
+          aws cloudformation deploy \
+            --template-file infrastructure/network.yml \
+            --stack-name "$NETWORK_STACK_NAME" \
+            --region "$AWS_REGION" \
+            --parameter-overrides \
+              ProjectName="$PROJECT_NAME" \
+              DomainName="${{ secrets.API_DOMAIN }}" \
+              CertificateArn="${{ secrets.ACM_CERTIFICATE_ARN }}"
+
+          echo "Network infrastructure deployed."
+
+
+      # ==========================================================
+      # 9. DEPLOY SECRETS INFRASTRUCTURE
+      # ==========================================================
+
+      - name: Deploy Secrets Infrastructure
+
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+        run: |
+
+          echo "Deploying secrets infrastructure..."
+
+          aws cloudformation deploy \
+            --template-file infrastructure/secrets.yml \
+            --stack-name "$SECRETS_STACK_NAME" \
+            --region "$AWS_REGION" \
+            --parameter-overrides \
+              ProjectName="$PROJECT_NAME"
+
+          echo "Secrets infrastructure deployed."
+
+
+      # ==========================================================
+      # 10. UPDATE DATABASE SECRET
+      # ==========================================================
+
+      - name: Update database secret
+
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+        run: |
+
+          echo "Updating DATABASE_URL..."
+
+          aws secretsmanager put-secret-value \
+            --region "$AWS_REGION" \
+            --secret-id "$PROJECT_NAME/DATABASE_URL" \
+            --secret-string "$DATABASE_URL"
+
+          echo "DATABASE_URL updated successfully."
+
+
+      # ==========================================================
+      # 11. DEPLOY ECS
+      # ==========================================================
+
+      - name: Deploy ECS Infrastructure
+
+        env:
+
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+          ECR_URL: ${{ secrets.ECR_URL }}
+
+          IMAGE_TAG: ${{ steps.image.outputs.image_tag }}
+
+        run: |
+
+          echo "Deploying ECS infrastructure..."
+
+          aws cloudformation deploy \
+            --template-file infrastructure/ecs.yml \
+            --stack-name "$ECS_STACK_NAME" \
+            --region "$AWS_REGION" \
+            --parameter-overrides \
+              ProjectName="$PROJECT_NAME" \
+              NetworkStackName="$NETWORK_STACK_NAME" \
+              ECRRepository="$ECR_URL" \
+              ImageTag="$IMAGE_TAG" \
+              DesiredCount=2 \
+            --capabilities CAPABILITY_NAMED_IAM
+
+          echo "ECS infrastructure deployed."
+
+
+      # ==========================================================
+      # 12. WAIT FOR ECS SERVICE TO STABILIZE
+      # ==========================================================
+
+      - name: Wait for ECS deployment
+
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+        run: |
+
+          echo "Waiting for ECS service..."
+
+          CLUSTER_NAME=$(aws cloudformation describe-stacks \
+            --stack-name "$ECS_STACK_NAME" \
+            --region "$AWS_REGION" \
+            --query "Stacks[0].Outputs[?OutputKey=='ClusterName'].OutputValue" \
+            --output text)
+
+
+          SERVICE_NAME=$(aws cloudformation describe-stacks \
+            --stack-name "$ECS_STACK_NAME" \
+            --region "$AWS_REGION" \
+            --query "Stacks[0].Outputs[?OutputKey=='ServiceName'].OutputValue" \
+            --output text)
+
+
+          echo "Cluster: $CLUSTER_NAME"
+          echo "Service: $SERVICE_NAME"
+
+
+          aws ecs wait services-stable \
+            --cluster "$CLUSTER_NAME" \
+            --services "$SERVICE_NAME" \
+            --region "$AWS_REGION"
+
+
+          echo "ECS service is stable."
+
+
+      # ==========================================================
+      # 13. SHOW DEPLOYMENT INFORMATION
+      # ==========================================================
+
+      - name: Deployment summary
+
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+        run: |
+
+          CLUSTER_NAME=$(aws cloudformation describe-stacks \
+            --stack-name "$ECS_STACK_NAME" \
+            --region "$AWS_REGION" \
+            --query "Stacks[0].Outputs[?OutputKey=='ClusterName'].OutputValue" \
+            --output text)
+
+
+          SERVICE_NAME=$(aws cloudformation describe-stacks \
+            --stack-name "$ECS_STACK_NAME" \
+            --region "$AWS_REGION" \
+            --query "Stacks[0].Outputs[?OutputKey=='ServiceName'].OutputValue" \
+            --output text)
+
+
+          TASK_DEFINITION=$(aws cloudformation describe-stacks \
+            --stack-name "$ECS_STACK_NAME" \
+            --region "$AWS_REGION" \
+            --query "Stacks[0].Outputs[?OutputKey=='TaskDefinition'].OutputValue" \
+            --output text)
+
+
+          echo ""
+          echo "=============================================="
+          echo "        NETFARM DEPLOYMENT"
+          echo "=============================================="
+          echo ""
+          echo "Image:"
+          echo "${{ steps.image.outputs.image }}"
+          echo ""
+          echo "Cluster:"
+          echo "$CLUSTER_NAME"
+          echo ""
+          echo "Service:"
+          echo "$SERVICE_NAME"
+          echo ""
+          echo "Task Definition:"
+          echo "$TASK_DEFINITION"
+          echo ""
+          echo "Desired Tasks:"
+          echo "2"
+          echo ""
+          echo "Status:"
+          echo "DEPLOYMENT SUCCESSFUL"
+          echo ""
+          echo "=============================================="
+

@@ -1,0 +1,398 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: ACD Plataform ECS Fargate Infrastructure
+
+Parameters:
+
+  ProjectName:
+    Type: String
+    Default: netfarm
+
+  NetworkStackName:
+    Type: String
+    Default: netfarm-network
+
+  ECRRepository:
+    Type: String
+
+  ImageTag:
+    Type: String
+    Default: latest
+
+  ContainerPort:
+    Type: Number
+    Default: 3000
+
+  ContainerCpu:
+    Type: String
+    Default: '256'
+
+  ContainerMemory:
+    Type: String
+    Default: '512'
+
+  DesiredCount:
+    Type: Number
+    Default: 2
+
+
+Resources:
+
+  # ==========================================================
+  # CLOUDWATCH LOG GROUP
+  # ==========================================================
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/ecs/${ProjectName}'
+      RetentionInDays: 30
+
+
+  # ==========================================================
+  # ECS CLUSTER
+  # ==========================================================
+
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub '${ProjectName}-cluster'
+
+
+  # ==========================================================
+  # ECS TASK EXECUTION ROLE
+  # ==========================================================
+
+  ECSExecutionRole:
+    Type: AWS::IAM::Role
+
+    Properties:
+      RoleName: !Sub '${ProjectName}-ecs-execution-role'
+
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+
+        Statement:
+          - Effect: Allow
+
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+
+            Action:
+              - sts:AssumeRole
+
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+
+  # ==========================================================
+  # SECRETS MANAGER POLICY
+  # ==========================================================
+
+  ECSExecutionSecretsPolicy:
+    Type: AWS::IAM::Policy
+
+    Properties:
+      PolicyName: !Sub '${ProjectName}-ecs-secrets-policy'
+
+      Roles:
+        - !Ref ECSExecutionRole
+
+      PolicyDocument:
+        Version: '2012-10-17'
+
+        Statement:
+          - Effect: Allow
+
+            Action:
+              - secretsmanager:GetSecretValue
+
+            Resource:
+              - Fn::ImportValue:
+                  !Sub '${ProjectName}-DatabaseUrlSecretArn'
+
+
+  # ==========================================================
+  # ECS TASK ROLE
+  # ==========================================================
+
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+
+    Properties:
+      RoleName: !Sub '${ProjectName}-ecs-task-role'
+
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+
+        Statement:
+          - Effect: Allow
+
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+
+            Action:
+              - sts:AssumeRole
+
+
+  # ==========================================================
+  # ECS TASK DEFINITION
+  # ==========================================================
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+
+    DependsOn:
+      - ECSExecutionSecretsPolicy
+
+    Properties:
+
+      Family: !Sub '${ProjectName}-task'
+
+      NetworkMode: awsvpc
+
+      RequiresCompatibilities:
+        - FARGATE
+
+      Cpu: !Ref ContainerCpu
+
+      Memory: !Ref ContainerMemory
+
+      ExecutionRoleArn:
+        Fn::GetAtt:
+          - ECSExecutionRole
+          - Arn
+
+      TaskRoleArn:
+        Fn::GetAtt:
+          - ECSTaskRole
+          - Arn
+
+
+      ContainerDefinitions:
+
+        - Name: !Ref ProjectName
+
+          Image: !Sub '${ECRRepository}:${ImageTag}'
+
+          Essential: true
+
+          Cpu: !Ref ContainerCpu
+
+          Memory: !Ref ContainerMemory
+
+
+          # ==================================================
+          # PORT
+          # ==================================================
+
+          PortMappings:
+
+            - ContainerPort: !Ref ContainerPort
+
+              HostPort: !Ref ContainerPort
+
+              Protocol: tcp
+
+
+          # ==================================================
+          # ENVIRONMENT VARIABLES
+          # ==================================================
+
+          Environment:
+
+            - Name: POSTGRES_USER
+              Value: netfarm
+
+            - Name: POSTGRES_PORT
+              Value: '5432'
+
+            - Name: POSTGRES_HOST
+              Value: 'SEU_HOST_POSTGRES'
+
+            - Name: POSTGRES_DATABASE
+              Value: netfarm
+
+            - Name: BUCKET_NAME
+              Value: document-land
+
+            - Name: FILE_CONFIG_GOOGLE_STORAGE
+              Value: keys.json
+
+            - Name: BASE_URL_GOOGLE_STORAGE
+              Value: https://storage.googleapis.com
+
+            - Name: PORTPORT
+              Value: '8000'
+
+
+          # ==================================================
+          # SECRETS
+          # ==================================================
+
+          Secrets:
+
+            - Name: POSTGRES_CONNECTION_STRING
+
+              ValueFrom:
+                Fn::ImportValue:
+                  !Sub '${ProjectName}-DatabaseUrlSecretArn'
+
+
+            - Name: POSTGRES_PASSWORD
+
+              ValueFrom:
+                Fn::ImportValue:
+                  !Sub '${ProjectName}-DatabaseUrlSecretArn'
+
+
+          # ==================================================
+          # CLOUDWATCH LOGS
+          # ==================================================
+
+          LogConfiguration:
+
+            LogDriver: awslogs
+
+            Options:
+
+              awslogs-group: !Ref LogGroup
+
+              awslogs-region: !Ref AWS::Region
+
+              awslogs-stream-prefix: ecs
+
+
+      # ======================================================
+      # TAGS
+      # ======================================================
+
+      Tags:
+
+        - Key: Project
+          Value: !Ref ProjectName
+
+
+  # ==========================================================
+  # ECS SERVICE
+  # ==========================================================
+
+  ECSService:
+    Type: AWS::ECS::Service
+
+    DependsOn:
+      - TaskDefinition
+
+    Properties:
+
+      ServiceName: !Sub '${ProjectName}-service'
+
+      Cluster: !Ref ECSCluster
+
+      LaunchType: FARGATE
+
+      DesiredCount: !Ref DesiredCount
+
+      TaskDefinition: !Ref TaskDefinition
+
+
+      DeploymentConfiguration:
+
+        MaximumPercent: 200
+
+        MinimumHealthyPercent: 50
+
+
+      # ========================================================
+      # LOAD BALANCER
+      # ========================================================
+
+      LoadBalancers:
+
+        - ContainerName: !Ref ProjectName
+
+          ContainerPort: !Ref ContainerPort
+
+          TargetGroupArn:
+            Fn::ImportValue:
+              !Sub '${NetworkStackName}-TargetGroupArn'
+
+
+      # ========================================================
+      # NETWORK
+      # ========================================================
+
+      NetworkConfiguration:
+
+        AwsvpcConfiguration:
+
+          AssignPublicIp: ENABLED
+
+          SecurityGroups:
+
+            - Fn::ImportValue:
+                !Sub '${NetworkStackName}-SecurityGroup'
+
+          Subnets:
+
+            - Fn::ImportValue:
+                !Sub '${NetworkStackName}-PublicSubnet1'
+
+            - Fn::ImportValue:
+                !Sub '${NetworkStackName}-PublicSubnet2'
+
+
+      HealthCheckGracePeriodSeconds: 60
+
+      DeploymentController:
+
+        Type: ECS
+
+
+# ==========================================================
+# OUTPUTS
+# ==========================================================
+
+Outputs:
+
+  ClusterName:
+
+    Description: ECS Cluster Name
+
+    Value: !Ref ECSCluster
+
+
+  ServiceName:
+
+    Description: ECS Service Name
+
+    Value: !Ref ECSService
+
+
+  TaskDefinition:
+
+    Description: ECS Task Definition
+
+    Value: !Ref TaskDefinition
+
+
+  ExecutionRole:
+
+    Description: ECS Task Execution Role
+
+    Value:
+      Fn::GetAtt:
+        - ECSExecutionRole
+        - Arn
+
+
+  TaskRole:
+
+    Description: ECS Task Role
+
+    Value:
+      Fn::GetAtt:
+        - ECSTaskRole
+        - Arn
