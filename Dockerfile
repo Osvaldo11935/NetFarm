@@ -16,8 +16,7 @@ COPY . .
 RUN go build -o main .
 
 # Defina a porta que será exposta
-EXPOSE 3000
+EXPOSE 8000
 
 # Comando para rodar a aplicação
 CMD ["./main"]
-ENTRYPOINT ["top", "-b"]
