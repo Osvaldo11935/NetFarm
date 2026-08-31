@@ -28,6 +28,16 @@ func NewRouter(
 		MaxAge:           12 * time.Hour,
 	}))
 
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+		})
+	})
+    router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+		})
+	})
 	//Add Route
 	baseRouter := router.Group("/api")
 	routers.AddOrderRoute(baseRouter, ordersController)
