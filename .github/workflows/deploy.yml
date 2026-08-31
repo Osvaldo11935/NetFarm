@@ -33,6 +33,7 @@ jobs:
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
+
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -52,6 +53,7 @@ jobs:
       # ==========================================================
 
       - name: Log in to Amazon ECR
+
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           ECR_URL: ${{ secrets.ECR_URL }}
@@ -70,6 +72,7 @@ jobs:
       # ==========================================================
 
       - name: Define Docker image tag
+
         id: image
 
         env:
@@ -167,25 +170,133 @@ jobs:
 
 
       # ==========================================================
-      # 10. UPDATE DATABASE SECRET
+      # 10. UPDATE ALL APPLICATION SECRETS
       # ==========================================================
 
-      - name: Update database secret
+      - name: Update application secrets
 
         env:
+
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
+          POSTGRES_CONNECTION_STRING: ${{ secrets.POSTGRES_CONNECTION_STRING }}
+
+          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+          FILE_CONFIG_GOOGLE_STORAGE: ${{ secrets.FILE_CONFIG_GOOGLE_STORAGE }}
+          BASE_URL_GOOGLE_STORAGE: ${{ secrets.BASE_URL_GOOGLE_STORAGE }}
+
+          PORT: ${{ secrets.PORT }}
 
         run: |
 
-          echo "Updating DATABASE_URL..."
+          echo "Updating application secrets..."
+
+          # ======================================================
+          # POSTGRES USER
+          # ======================================================
 
           aws secretsmanager put-secret-value \
             --region "$AWS_REGION" \
-            --secret-id "$PROJECT_NAME/DATABASE_URL" \
-            --secret-string "$DATABASE_URL"
+            --secret-id "$PROJECT_NAME/POSTGRES_USER" \
+            --secret-string "$POSTGRES_USER"
 
-          echo "DATABASE_URL updated successfully."
+
+          # ======================================================
+          # POSTGRES PORT
+          # ======================================================
+
+          aws secretsmanager put-secret-value \
+            --region "$AWS_REGION" \
+            --secret-id "$PROJECT_NAME/POSTGRES_PORT" \
+            --secret-string "$POSTGRES_PORT"
+
+
+          # ======================================================
+          # POSTGRES HOST
+          # ======================================================
+
+          aws secretsmanager put-secret-value \
+            --region "$AWS_REGION" \
+            --secret-id "$PROJECT_NAME/POSTGRES_HOST" \
+            --secret-string "$POSTGRES_HOST"
+
+
+          # ======================================================
+          # POSTGRES PASSWORD
+          # ======================================================
+
+          aws secretsmanager put-secret-value \
+            --region "$AWS_REGION" \
+            --secret-id "$PROJECT_NAME/POSTGRES_PASSWORD" \
+            --secret-string "$POSTGRES_PASSWORD"
+
+
+          # ======================================================
+          # POSTGRES DATABASE
+          # ======================================================
+
+          aws secretsmanager put-secret-value \
+            --region "$AWS_REGION" \
+            --secret-id "$PROJECT_NAME/POSTGRES_DATABASE" \
+            --secret-string "$POSTGRES_DATABASE"
+
+
+          # ======================================================
+          # POSTGRES CONNECTION STRING
+          # ======================================================
+
+          aws secretsmanager put-secret-value \
+            --region "$AWS_REGION" \
+            --secret-id "$PROJECT_NAME/POSTGRES_CONNECTION_STRING" \
+            --secret-string "$POSTGRES_CONNECTION_STRING"
+
+
+          # ======================================================
+          # GOOGLE STORAGE BUCKET
+          # ======================================================
+
+          aws secretsmanager put-secret-value \
+            --region "$AWS_REGION" \
+            --secret-id "$PROJECT_NAME/BUCKET_NAME" \
+            --secret-string "$BUCKET_NAME"
+
+
+          # ======================================================
+          # GOOGLE STORAGE CONFIG
+          # ======================================================
+
+          aws secretsmanager put-secret-value \
+            --region "$AWS_REGION" \
+            --secret-id "$PROJECT_NAME/FILE_CONFIG_GOOGLE_STORAGE" \
+            --secret-string "$FILE_CONFIG_GOOGLE_STORAGE"
+
+
+          # ======================================================
+          # GOOGLE STORAGE BASE URL
+          # ======================================================
+
+          aws secretsmanager put-secret-value \
+            --region "$AWS_REGION" \
+            --secret-id "$PROJECT_NAME/BASE_URL_GOOGLE_STORAGE" \
+            --secret-string "$BASE_URL_GOOGLE_STORAGE"
+
+
+          # ======================================================
+          # APPLICATION PORT
+          # ======================================================
+
+          aws secretsmanager put-secret-value \
+            --region "$AWS_REGION" \
+            --secret-id "$PROJECT_NAME/PORT" \
+            --secret-string "$PORT"
+
+
+          echo "All application secrets updated successfully."
 
 
       # ==========================================================
@@ -295,7 +406,7 @@ jobs:
 
           echo ""
           echo "=============================================="
-          echo "        NETFARM DEPLOYMENT"
+          echo "          NETFARM DEPLOYMENT"
           echo "=============================================="
           echo ""
           echo "Image:"
