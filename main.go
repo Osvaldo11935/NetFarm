@@ -35,6 +35,26 @@ func main() {
 		controllersSetup.OrderDetailController,
 		controllersSetup.CategoryController,
 	)
+
+
+	// Health check
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_ = json.NewEncoder(w).Encode(map[string]string{
+			"status": "ok",
+		})
+	})
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		_ = json.NewEncoder(w).Encode(map[string]string{
+			"status": "ok",
+		})
+	})
+	
 	port := extensions.GetEnv("PORT")
 	
 	server := &http.Server{
