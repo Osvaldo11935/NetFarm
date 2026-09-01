@@ -2,7 +2,6 @@ package common
 
 import (
 	"NetFarm/application/interfaces/irepositories/common"
-	"NetFarm/persistence/database"
 	"gorm.io/gorm"
 )
 
@@ -10,10 +9,11 @@ type Repository struct {
 	db *gorm.DB
 }
 
-func NewRepository() common.IBaseRepository {
-	db, _ := database.NewDatabase()
 
-	return &Repository{db}
+func NewRepository(db *gorm.DB) common.IBaseRepository {
+	return &Repository{
+		db: db,
+	}
 }
 
 func (r *Repository) Create(entity interface{}) error {

@@ -16,7 +16,15 @@ func NewDatabase() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	errMigration := db.AutoMigrate(
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+
+	sqlDB.SetMaxOpenConns(5)
+	sqlDB.SetMaxIdleConns(2)
+
+	err = db.AutoMigrate(
 		&entities.Role{},
 		&entities.User{},
 		&entities.Address{},
@@ -35,13 +43,13 @@ func NewDatabase() (*gorm.DB, error) {
 		&entities.MedicineCategory{},
 	)
 
+	if err != nil {
+		return nil, err
+	}
+
 	entities.InitialValueRole(db)
 	entities.InitialValueUser(db)
 	entities.InitialValueStatus(db)
-
-	if errMigration != nil {
-		return nil, errMigration
-	}
 
 	return db, nil
 }

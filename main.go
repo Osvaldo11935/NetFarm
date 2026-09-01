@@ -7,11 +7,18 @@ import (
 	"NetFarm/webApi/setup"
 	"fmt"
 	"net/http"
+	"NetFarm/persistence/database"
 )
 
 func main() {
-	// Setup repositories, servicesSetup, and controllersSetup
-	repos := setup.NewRepositories()
+	db, errDb := database.NewDatabase()
+	if errDb != nil {
+		fmt.Println("Erro ao conectar ao banco:", errDb)
+		return
+	}
+
+	repos := setup.NewRepositories(db)
+
 	servicesSetup := setup.NewServices(repos)
 	storage := storages.NewGoogleStorage()
 	controllersSetup := setup.NewControllers(servicesSetup, &storage)

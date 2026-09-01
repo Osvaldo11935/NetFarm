@@ -3,6 +3,7 @@ package setup
 import (
 	"NetFarm/application/interfaces/irepositories"
 	"NetFarm/persistence/repositories"
+	"gorm.io/gorm"
 )
 
 type RepositoriesSetup struct {
@@ -23,22 +24,22 @@ type RepositoriesSetup struct {
 	CategoryRepo    irepositories.ICategoryRepository
 }
 
-func NewRepositories() *RepositoriesSetup {
+func NewRepositories(db *gorm.DB) *RepositoriesSetup {
 	return &RepositoriesSetup{
-		OrdersRepo:      repositories.NewOrderRepository(),
-		OrderStatusRepo: repositories.NewOrderStatusRepository(),
-		OrderFileRepo:   repositories.NewOrderFileRepository(),
-		OrderItemRepo:   repositories.NewOrderItemRepository(),
-		FileTypeRepo:    repositories.NewFileTypeRepository(),
-		RoleRepo:        repositories.NewRoleRepository(),
-		PersonRepo:      repositories.NewPersonRepository(),
-		UserRepo:        repositories.NewUserRepository(),
-		AddressRepo:     repositories.NewAddressRepository(),
-		MedicineRepo:    repositories.NewMedicineRepository(),
-		ProviderRepo:    repositories.NewProviderRepository(),
-		ImposedRepo:     repositories.NewImposedRepository(),
-		ExpenseRepo:     repositories.NewExpenseRepository(),
-		OrderDetailRepo: repositories.NewOrderDetailRepository(),
-		CategoryRepo:    repositories.NewCategoryRepository(),
+		OrdersRepo:      repositories.NewOrderRepository(db),
+		OrderStatusRepo: repositories.NewOrderStatusRepository(db),
+		OrderFileRepo:   repositories.NewOrderFileRepository(db),
+		OrderItemRepo:   repositories.NewOrderItemRepository(db),
+		FileTypeRepo:    repositories.NewFileTypeRepository(db),
+		RoleRepo:        repositories.NewRoleRepository(db),
+		PersonRepo:      repositories.NewPersonRepository(db),
+		UserRepo:        repositories.NewUserRepository(db),
+		AddressRepo:     repositories.NewAddressRepository(db),
+		MedicineRepo:    repositories.NewMedicineRepository(db),
+		ProviderRepo:    repositories.NewProviderRepository(db),
+		ImposedRepo:     repositories.NewImposedRepository(db),
+		ExpenseRepo:     repositories.NewExpenseRepository(db),
+		OrderDetailRepo: repositories.NewOrderDetailRepository(db),
+		CategoryRepo:    repositories.NewCategoryRepository(db),
 	}
 }

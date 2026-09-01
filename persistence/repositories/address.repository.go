@@ -3,14 +3,16 @@ package repositories
 import (
 	"NetFarm/application/interfaces/irepositories"
 	"NetFarm/persistence/repositories/common"
+
+	"gorm.io/gorm"
 )
 
 type AddressRepository struct {
 	*common.Repository
 }
 
-func NewAddressRepository() irepositories.IAddressRepository {
+func NewAddressRepository(db *gorm.DB) irepositories.IAddressRepository {
 	return &AddressRepository{
-		Repository: common.NewRepository().(*common.Repository),
+		Repository: common.NewRepository(db).(*common.Repository),
 	}
 }
