@@ -21,7 +21,7 @@ Parameters:
 
   ContainerPort:
     Type: Number
-    Default: 3000
+    Default: 8000
 
   DomainName:
     Type: String
