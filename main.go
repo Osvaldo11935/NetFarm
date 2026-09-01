@@ -44,7 +44,7 @@ func main() {
 	)
 
 	port := extensions.GetEnv("PORT")
-	
+	fmt.Println("Execuntando na porta:", port)
 	server := &http.Server{
 		Addr:    ":"+port,
 		Handler: routes,
